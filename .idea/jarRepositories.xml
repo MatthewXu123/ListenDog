@@ -21,5 +21,10 @@
       <option name="name" value="Google" />
       <option name="url" value="https://dl.google.com/dl/android/maven2/" />
     </remote-repository>
+    <remote-repository>
+      <option name="id" value="006b793c-b9e2-4ba1-b266-96d258aa5ee3" />
+      <option name="name" value="006b793c-b9e2-4ba1-b266-96d258aa5ee3" />
+      <option name="url" value="https://maven.aliyun.com/nexus/content/groups/public/" />
+    </remote-repository>
   </component>
 </project>

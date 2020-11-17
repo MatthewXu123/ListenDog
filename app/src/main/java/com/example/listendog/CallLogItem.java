@@ -2,7 +2,7 @@ package com.example.listendog;
 
 import java.util.Date;
 
-public class SingleCallLog {
+public class CallLogItem {
     private String name;
 
     private String number;

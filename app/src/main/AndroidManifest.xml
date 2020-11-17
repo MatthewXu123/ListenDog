@@ -10,14 +10,19 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ListenDog"
         >
-        <activity android:name=".MainActivity">
+        <activity android:name=".MainActivity"
+            android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
+        <service
+            android:name=".service.AlarmService"
+            android:enabled="true"
+            android:exported="true"/>
+        <receiver android:name=".service.AlarmReceive"/>
     </application>
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
-    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 </manifest>
