@@ -1,50 +1,50 @@
 package com.example.listendog.util;
 
-import android.content.ContentResolver;
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.CallLog;
+import android.telecom.PhoneAccountHandle;
+import android.telecom.TelecomManager;
+import android.telephony.SubscriptionInfo;
+import android.telephony.SubscriptionManager;
+import android.text.TextUtils;
+import android.util.Log;
 
-import com.example.listendog.MainActivity;
+import androidx.appcompat.app.AppCompatActivity;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.lang.annotation.Target;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static android.content.ContentValues.TAG;
+
 public class CallLogUtil {
 
-    /**
-     * 读取数据
-     *
-     * @return 读取到的数据
-     */
-    private List<Map<String, String>> getCallLogList() {
-        MainActivity mainActivity = MainActivity.this;
-        // 1.获得ContentResolver
-        ContentResolver resolver = MainActivity.this.getContentResolver();
-        // 2.利用ContentResolver的query方法查询通话记录数据库
-        /**
-         * @param uri 需要查询的URI，（这个URI是ContentProvider提供的）
-         * @param projection 需要查询的字段
-         * @param selection sql语句where之后的语句
-         * @param selectionArgs ?占位符代表的数据
-         * @param sortOrder 排序方式
-         *
-         */
-        Cursor cursor = resolver.query(CallLog.Calls.CONTENT_URI, // 查询通话记录的URI
-                new String[] { CallLog.Calls.CACHED_NAME// 通话记录的联系人
-                        , CallLog.Calls.NUMBER// 通话记录的电话号码
-                        , CallLog.Calls.DATE// 通话记录的日期
-                        , CallLog.Calls.TYPE
-                }
-                , null, null, CallLog.Calls.DEFAULT_SORT_ORDER// 按照时间逆序排列，最近打的最先显示
-        );
-        // 3.通过Cursor获得数据
+    public static final String[] COLUMNS = {CallLog.Calls.CACHED_NAME, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
+    private static final int INCOMING_CALL = 1;
+    private static final int OUTGOING_CALL = 2;
+    private static final int MISSED_CALL = 3;
+
+    public static final String[] dualSimTypes = { "subscription", "Subscription",
+            "com.android.phone.extra.slot",
+            "phone", "com.android.phone.DialingMode",
+            "simId", "simnum", "phone_type",
+            "simSlot" };
+
+    public static final List<String> REQUIRED_NUMBER_GROUP = Arrays.asList("051266628226", "051266628227");
+
+    public static List<Map<String, String>> getSpecifiedCallLogList(AppCompatActivity appCompatActivity){
+        Cursor cursor = getCallLogCursor(appCompatActivity);
         List<Map<String, String>> callLogs = new ArrayList<>();
         while (cursor.moveToNext()) {
             int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
@@ -66,27 +66,42 @@ public class CallLogUtil {
                 }
             }
         }
+
         return callLogs;
     }
 
     /**
      *
+     * @param appCompatActivity
+     * @return
+     */
+    private static Cursor getCallLogCursor(AppCompatActivity appCompatActivity) {
+        return appCompatActivity.getContentResolver().query(CallLog.Calls.CONTENT_URI,
+                new String[] { CallLog.Calls.CACHED_NAME
+                        , CallLog.Calls.NUMBER
+                        , CallLog.Calls.DATE
+                        , CallLog.Calls.TYPE
+                }
+                , null, null, CallLog.Calls.DEFAULT_SORT_ORDER
+        );
+    }
+
+    /***
+     *
      * @param callLogDate
      * @return
      */
-    private boolean isCallDateQualified(Date callLogDate){
+    private static boolean isCallDateQualified(Date callLogDate){
         Date lastHourTime = DateUtil.getLastHourTime(-1);
         return callLogDate.after(DateUtil.addMinutes(lastHourTime, -15)) && callLogDate.before(DateUtil.addMinutes(lastHourTime, 15));
     }
 
-    /**
-     * 拨打电话（直接拨打电话）
-     * @param phoneNum 电话号码
-     */
-    public void callPhone(String phoneNum){
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        Uri data = Uri.parse("tel:" + phoneNum);
-        intent.setData(data);
-        startActivity(intent);
+    public static void callPhone(AppCompatActivity appCompatActivity, String number) {
+        Intent callIntent = new Intent(Intent.ACTION_CALL);
+        callIntent.setData(Uri.parse("tel:" + number));
+        for (int i=0; i < dualSimTypes.length; i++) {
+            callIntent.putExtra(dualSimTypes[i], 0);
+        }
+        appCompatActivity.startActivity(callIntent);
     }
 }

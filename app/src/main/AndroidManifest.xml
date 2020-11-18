@@ -24,5 +24,6 @@
         <receiver android:name=".service.AlarmReceive"/>
     </application>
     <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.WRITE_CALL_LOG" />
     <uses-permission android:name="android.permission.CALL_PHONE" />
 </manifest>

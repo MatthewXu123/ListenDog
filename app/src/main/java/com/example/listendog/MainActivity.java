@@ -1,62 +1,58 @@
 package com.example.listendog;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.TimerTask;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import android.content.ContentResolver;
+import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
+import android.provider.Settings;
 import android.util.Log;
-import android.view.View;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.listendog.service.AlarmService;
+import com.example.listendog.util.CallLogUtil;
 import com.example.listendog.util.DateUtil;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
-    private static final String[] COLUMNS = {CallLog.Calls.CACHED_NAME, CallLog.Calls.NUMBER, CallLog.Calls.DATE};
-    private static final int INCOMING_CALL = 1;
-    private static final int OUTGOING_CALL = 2;
-    private static final int MISSED_CALL = 3;
-
-    private static final List<String> REQUIRED_NUMBER_GROUP = Arrays.asList("051266628226", "051266628227");
-
-    private Map<String, Integer> numberMissCountMap = new HashMap<>();
-
-    private static final Integer NUMER_MISS_COUNT_THRESHOLD = 2;
-
     private static MainActivity INSTANCE;
+    // About the permissions...
+    private List<String> unPermissionList = new ArrayList<String>(); //申请未得到授权的权限列表
+    private AlertDialog mPermissionDialog;
+    private String mPackName ;
+    private String[] permissionList = new String[]{
+            Manifest.permission.READ_CALL_LOG,
+            Manifest.permission.WRITE_CALL_LOG,
+            Manifest.permission.CALL_PHONE
+    };
 
+    // About the call logs
+    private Map<String, Integer> numberMissCountMap = new HashMap<>();
+    private static final Integer NUMER_MISS_COUNT_THRESHOLD = 2;
     private ListView mLVShow;
-
     private Date lastQueryTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d(TAG, "onCreate: This activity is created...");
+        checkPermission();
         INSTANCE = this;
-        for(String requiredNumber : REQUIRED_NUMBER_GROUP){
+        for(String requiredNumber : CallLogUtil.REQUIRED_NUMBER_GROUP){
             numberMissCountMap.put(requiredNumber, 0);
         }
         setContentView(R.layout.layout_main);
@@ -72,14 +68,16 @@ public class MainActivity extends AppCompatActivity {
     public void setListView(){
         lastQueryTime = new Date();
         Log.d(TAG, "run: Enter this task...");
-        List<Map<String, String>> callLogList = getCallLogList();
+        List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this);
         if(callLogList.size() == 0 || !hasRequiredNumberGroup(callLogList)){
             TextView tvInfo = (TextView) findViewById(R.id.tv_info);
             tvInfo.setText("电话系统可能已暂停服务，请检查！");
-            callPhone("15366203524");
+            CallLogUtil.callPhone(MainActivity.this, "15366203524");
         }
-        SimpleAdapter adapter = new SimpleAdapter(this, callLogList, R.layout.item_call_log
-                , COLUMNS
+        SimpleAdapter adapter = new SimpleAdapter(this
+                , callLogList
+                , R.layout.item_call_log
+                , CallLogUtil.COLUMNS
                 , new int[] { R.id.tv_name, R.id.tv_number, R.id.tv_date});
         mLVShow.setAdapter(adapter);
         TextView tvQueryTime = (TextView) findViewById(R.id.tv_query);
@@ -87,74 +85,87 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * 读取数据
-     *
-     * @return 读取到的数据
+     * Check the required permissions
      */
-    private List<Map<String, String>> getCallLogList() {
-        // 1.获得ContentResolver
-        ContentResolver resolver = getContentResolver();
-        // 2.利用ContentResolver的query方法查询通话记录数据库
-        /**
-         * @param uri 需要查询的URI，（这个URI是ContentProvider提供的）
-         * @param projection 需要查询的字段
-         * @param selection sql语句where之后的语句
-         * @param selectionArgs ?占位符代表的数据
-         * @param sortOrder 排序方式
-         *
-         */
-        Cursor cursor = resolver.query(CallLog.Calls.CONTENT_URI, // 查询通话记录的URI
-                new String[] { CallLog.Calls.CACHED_NAME// 通话记录的联系人
-                        , CallLog.Calls.NUMBER// 通话记录的电话号码
-                        , CallLog.Calls.DATE// 通话记录的日期
-                        , CallLog.Calls.TYPE
-                        }
-                , null, null, CallLog.Calls.DEFAULT_SORT_ORDER// 按照时间逆序排列，最近打的最先显示
-        );
-        // 3.通过Cursor获得数据
-        List<Map<String, String>> callLogs = new ArrayList<>();
-        while (cursor.moveToNext()) {
-            int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
-            if(type != OUTGOING_CALL){
-                String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
-                if(REQUIRED_NUMBER_GROUP.contains(number)){
-                    Date callDate = new Date(Long.valueOf(cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE))));
-                    if(isCallDateQualified(callDate)){
-                        Map<String, String> map = new HashMap<>();
-                        // Name
-                        String cachedName = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME));
-                        map.put(COLUMNS[0], StringUtils.isBlank(cachedName) ? "未备注的联系人" : cachedName);
-                        // Number
-                        map.put(COLUMNS[1], number);
-                        // Date
-                        map.put(COLUMNS[2], DateUtil.format(callDate, DateUtil.DEFAULT_DATETIME_FORMAT));
-                        callLogs.add(map);
-                    }
+    public void checkPermission() {
+        unPermissionList.clear();
+        for (int i = 0; i < permissionList.length; i++) {
+            if (ContextCompat.checkSelfPermission(this, permissionList[i]) !=
+                    PackageManager.PERMISSION_GRANTED) {
+                unPermissionList.add(permissionList[i]);
+            }
+        }
+
+        if (unPermissionList.size() > 0) {
+            ActivityCompat.requestPermissions( this,permissionList, 100);
+            Log.i(TAG, "check 有权限未通过");
+        } else {
+            Log.i(TAG, "check 权限都已经申请通过");
+        }
+    }
+
+    /**
+     * 5.请求权限后回调的方法
+     *
+     * @param requestCode  是我们自己定义的权限请求码
+     * @param permissions  是我们请求的权限名称数组
+     * @param grantResults 是我们在弹出页面后是否允许权限的标识数组，数组的长度对应的是权限
+     *                     名称数组的长度，数组的数据0表示允许权限，-1表示我们点击了禁止权限
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.i(TAG,"申请结果反馈");
+        boolean hasPermissionDismiss = false;
+        if (100 == requestCode) {
+            for (int i = 0; i < grantResults.length; i++) {
+                if (grantResults[i] == -1) {
+                    hasPermissionDismiss = true; //有权限没有通过
+                    Log.i(TAG,"有权限没有被通过");
+                    break;
                 }
             }
         }
-        return callLogs;
+        if (hasPermissionDismiss) {//如果有没有被允许的权限
+            showPermissionDialog();
+        } else {
+            //权限已经都通过了，可以将程序继续打开了
+            Log.i(TAG, "onRequestPermissionsResult 权限都已经申请通过");
+        }
     }
 
     /**
-     *
-     * @param callLogDate
-     * @return
+     * 不再提示权限时的展示对话框
      */
-    private boolean isCallDateQualified(Date callLogDate){
-        Date lastHourTime = DateUtil.getLastHourTime(-1);
-        return callLogDate.after(DateUtil.addMinutes(lastHourTime, -15)) && callLogDate.before(DateUtil.addMinutes(lastHourTime, 15));
+    private void showPermissionDialog() {
+        Log.i(TAG,"mPackName: " + mPackName);
+        if (mPermissionDialog == null) {
+            mPermissionDialog = new AlertDialog.Builder(this)
+                    .setMessage("已禁用权限，请手动授予")
+                    .setPositiveButton("设置", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            cancelPermissionDialog();
+                            Uri packageURI = Uri.parse("package:" + mPackName);     //去设置里面设置
+                            Intent intent = new Intent(Settings.
+                                    ACTION_APPLICATION_DETAILS_SETTINGS, packageURI);
+                            startActivity(intent);
+                        }
+                    })
+                    .setNegativeButton("取消", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            cancelPermissionDialog();
+                        }
+                    })
+                    .create();
+        }
+        mPermissionDialog.show();
     }
 
-    /**
-     * 拨打电话（直接拨打电话）
-     * @param phoneNum 电话号码
-     */
-    public void callPhone(String phoneNum){
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        Uri data = Uri.parse("tel:" + phoneNum);
-        intent.setData(data);
-        startActivity(intent);
+    private void cancelPermissionDialog() {
+        mPermissionDialog.cancel();
     }
 
     /**
@@ -168,7 +179,7 @@ public class MainActivity extends AppCompatActivity {
             // Add all the number into the list.
             numberList.add(callLog.get(CallLog.Calls.NUMBER));
         }
-        for(String requiredNumber : REQUIRED_NUMBER_GROUP){
+        for(String requiredNumber : CallLogUtil.REQUIRED_NUMBER_GROUP){
             if(!numberList.contains(requiredNumber)){
                 numberMissCountMap.put(requiredNumber, numberMissCountMap.get(requiredNumber) + 1);
             }
@@ -188,5 +199,14 @@ public class MainActivity extends AppCompatActivity {
             return false;
         return  true;
     }
+
+    /*public void callPhone(String phoneNum) {
+        Intent intent = new Intent(Intent.ACTION_CALL);
+        Uri data = Uri.parse("tel:" + phoneNum);
+        intent.setData(data);
+        startActivity(intent);
+    }*/
+
+
 }
 
