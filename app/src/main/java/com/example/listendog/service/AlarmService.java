@@ -17,6 +17,7 @@ import android.widget.SimpleAdapter;
 import com.example.listendog.MainActivity;
 import com.example.listendog.R;
 import com.example.listendog.util.DateUtil;
+import com.example.listendog.util.PropertiesUtil;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,6 +26,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class AlarmService extends Service {
     private static final String TAG = "AlarmService";
@@ -35,6 +37,7 @@ public class AlarmService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: Enter...");
+        Properties properties = PropertiesUtil.getProperties(getApplicationContext());
         MainActivity.getINSTANCE().runOnUiThread(new Runnable() {
             @Override
             public void run() {
@@ -44,7 +47,7 @@ public class AlarmService extends Service {
 
         //通过AlarmManager定时启动广播
         AlarmManager alarmManager= (AlarmManager) getSystemService(ALARM_SERVICE);
-        long triggerAtTime= SystemClock.elapsedRealtime() + ONE_MINIUTE;//从开机到现在的毫秒书（手机睡眠(sleep)的时间也包括在内
+        long triggerAtTime= SystemClock.elapsedRealtime() + Long.valueOf(properties.getProperty(PropertiesUtil.RUN_DURATION));//从开机到现在的毫秒书（手机睡眠(sleep)的时间也包括在内
         Intent i=new Intent(this, AlarmReceive.class);
         PendingIntent pIntent=PendingIntent.getBroadcast(this,PENDING_REQUEST,i,PENDING_REQUEST);
         alarmManager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,triggerAtTime,pIntent);

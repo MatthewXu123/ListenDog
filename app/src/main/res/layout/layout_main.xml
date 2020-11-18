@@ -31,9 +31,27 @@
            android:textSize="20sp"
            />
    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="70dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:text="下次查询时间:"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_next_query"
+            android:textSize="20sp"
+            />
+    </LinearLayout>
     <ListView
         android:id="@+id/lv_show"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="70dp" />
+        android:layout_marginTop="100dp" />
 </RelativeLayout>

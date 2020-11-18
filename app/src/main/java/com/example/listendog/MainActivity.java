@@ -21,18 +21,20 @@ import androidx.core.content.ContextCompat;
 import com.example.listendog.service.AlarmService;
 import com.example.listendog.util.CallLogUtil;
 import com.example.listendog.util.DateUtil;
+import com.example.listendog.util.PropertiesUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
     private static MainActivity INSTANCE;
     // About the permissions...
-    private List<String> unPermissionList = new ArrayList<String>(); //申请未得到授权的权限列表
+    private List<String> unPermissionList = new ArrayList<String>();
     private AlertDialog mPermissionDialog;
     private String mPackName ;
     private String[] permissionList = new String[]{
@@ -43,16 +45,21 @@ public class MainActivity extends AppCompatActivity {
 
     // About the call logs
     private Map<String, Integer> numberMissCountMap = new HashMap<>();
-    private static final Integer NUMER_MISS_COUNT_THRESHOLD = 2;
     private ListView mLVShow;
     private Date lastQueryTime;
+    private Properties properties;
+    public static final List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermission();
         INSTANCE = this;
-        for(String requiredNumber : CallLogUtil.REQUIRED_NUMBER_GROUP){
+        // Properties
+        properties = PropertiesUtil.getProperties(getApplicationContext());
+        getRequiredNumberGroup();
+
+        for(String requiredNumber : REQUIRED_NUMBER_GROUP){
             numberMissCountMap.put(requiredNumber, 0);
         }
         setContentView(R.layout.layout_main);
@@ -68,11 +75,15 @@ public class MainActivity extends AppCompatActivity {
     public void setListView(){
         lastQueryTime = new Date();
         Log.d(TAG, "run: Enter this task...");
-        List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this);
+        List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this,
+                REQUIRED_NUMBER_GROUP,
+                Integer.valueOf(properties.getProperty(PropertiesUtil.CALL_DURATION)));
         if(callLogList.size() == 0 || !hasRequiredNumberGroup(callLogList)){
             TextView tvInfo = (TextView) findViewById(R.id.tv_info);
             tvInfo.setText("电话系统可能已暂停服务，请检查！");
-            CallLogUtil.callPhone(MainActivity.this, "15366203524");
+            CallLogUtil.callPhone(MainActivity.this,
+                    properties.getProperty(PropertiesUtil.CALL_NUMBER),
+                    Integer.valueOf(properties.getProperty(PropertiesUtil.DEFAULT_SIM)));
         }
         SimpleAdapter adapter = new SimpleAdapter(this
                 , callLogList
@@ -80,8 +91,12 @@ public class MainActivity extends AppCompatActivity {
                 , CallLogUtil.COLUMNS
                 , new int[] { R.id.tv_name, R.id.tv_number, R.id.tv_date});
         mLVShow.setAdapter(adapter);
+        // Set the value of query time.
         TextView tvQueryTime = (TextView) findViewById(R.id.tv_query);
         tvQueryTime.setText(DateUtil.format(lastQueryTime, DateUtil.DEFAULT_DATETIME_FORMAT));
+        TextView tvNextQueryTime = (TextView) findViewById(R.id.tv_next_query);
+        tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(lastQueryTime,(Integer.valueOf(properties.getProperty(PropertiesUtil.RUN_DURATION))) / (60 * 1000)),
+                DateUtil.DEFAULT_DATETIME_FORMAT));
     }
 
     /**
@@ -179,7 +194,7 @@ public class MainActivity extends AppCompatActivity {
             // Add all the number into the list.
             numberList.add(callLog.get(CallLog.Calls.NUMBER));
         }
-        for(String requiredNumber : CallLogUtil.REQUIRED_NUMBER_GROUP){
+        for(String requiredNumber : REQUIRED_NUMBER_GROUP){
             if(!numberList.contains(requiredNumber)){
                 numberMissCountMap.put(requiredNumber, numberMissCountMap.get(requiredNumber) + 1);
             }
@@ -189,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
         for(Map.Entry<String, Integer> entry : numberMissCountMap.entrySet()){
             String number = entry.getKey();
             Integer numberCount = entry.getValue();
-            if(numberCount >= NUMER_MISS_COUNT_THRESHOLD){
+            if(numberCount >= Integer.valueOf(properties.getProperty(PropertiesUtil.NUMBER_MISS_THRESHOLD))){
                 numberMissCount2 ++;
                 // Reset the missing times.
                 numberMissCountMap.put(number, 0);
@@ -200,13 +215,12 @@ public class MainActivity extends AppCompatActivity {
         return  true;
     }
 
-    /*public void callPhone(String phoneNum) {
-        Intent intent = new Intent(Intent.ACTION_CALL);
-        Uri data = Uri.parse("tel:" + phoneNum);
-        intent.setData(data);
-        startActivity(intent);
-    }*/
-
+    public void getRequiredNumberGroup(){
+        String numberGroupStr = MainActivity.this.properties.getProperty(PropertiesUtil.REQUIRED_NUMBER_GROUP);
+        String[] split = numberGroupStr.split(",");
+        for(String str : split)
+            REQUIRED_NUMBER_GROUP.add(str);
+    }
 
 }
 

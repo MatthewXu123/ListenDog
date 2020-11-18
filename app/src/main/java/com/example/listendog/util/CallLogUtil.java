@@ -41,18 +41,16 @@ public class CallLogUtil {
             "simId", "simnum", "phone_type",
             "simSlot" };
 
-    public static final List<String> REQUIRED_NUMBER_GROUP = Arrays.asList("051266628226", "051266628227");
-
-    public static List<Map<String, String>> getSpecifiedCallLogList(AppCompatActivity appCompatActivity){
+    public static List<Map<String, String>> getSpecifiedCallLogList(AppCompatActivity appCompatActivity, List<String> requiredNumberGroup, int callDuration){
         Cursor cursor = getCallLogCursor(appCompatActivity);
         List<Map<String, String>> callLogs = new ArrayList<>();
         while (cursor.moveToNext()) {
             int type = cursor.getColumnIndex(CallLog.Calls.TYPE);
             if(type != OUTGOING_CALL){
                 String number = cursor.getString(cursor.getColumnIndex(CallLog.Calls.NUMBER));
-                if(REQUIRED_NUMBER_GROUP.contains(number)){
+                if(requiredNumberGroup.contains(number)){
                     Date callDate = new Date(Long.valueOf(cursor.getString(cursor.getColumnIndex(CallLog.Calls.DATE))));
-                    if(isCallDateQualified(callDate)){
+                    if(isCallDateQualified(callDate, callDuration)){
                         Map<String, String> map = new HashMap<>();
                         // Name
                         String cachedName = cursor.getString(cursor.getColumnIndex(CallLog.Calls.CACHED_NAME));
@@ -91,16 +89,16 @@ public class CallLogUtil {
      * @param callLogDate
      * @return
      */
-    private static boolean isCallDateQualified(Date callLogDate){
+    private static boolean isCallDateQualified(Date callLogDate, int callDuration){
         Date lastHourTime = DateUtil.getLastHourTime(-1);
-        return callLogDate.after(DateUtil.addMinutes(lastHourTime, -15)) && callLogDate.before(DateUtil.addMinutes(lastHourTime, 15));
+        return callLogDate.after(DateUtil.addMinutes(lastHourTime, -1 * callDuration)) && callLogDate.before(DateUtil.addMinutes(lastHourTime, callDuration));
     }
 
-    public static void callPhone(AppCompatActivity appCompatActivity, String number) {
+    public static void callPhone(AppCompatActivity appCompatActivity, String number, int simId) {
         Intent callIntent = new Intent(Intent.ACTION_CALL);
         callIntent.setData(Uri.parse("tel:" + number));
         for (int i=0; i < dualSimTypes.length; i++) {
-            callIntent.putExtra(dualSimTypes[i], 0);
+            callIntent.putExtra(dualSimTypes[i], simId);
         }
         appCompatActivity.startActivity(callIntent);
     }
