@@ -2,6 +2,7 @@ package com.example.listendog;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -33,7 +34,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity {
     private static final String TAG = "MainActivity";
     private static MainActivity INSTANCE;
     // About the permissions...
@@ -50,16 +51,17 @@ public class MainActivity extends AppCompatActivity {
     private Map<String, Integer> numberMissCountMap = new HashMap<>();
     private ListView mLVShow;
     private Date lastQueryTime;
-    private Properties properties;
     public static final List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
+
+    public static MainActivity getINSTANCE(){
+        return INSTANCE;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         checkPermission();
         INSTANCE = this;
-        // Properties
-        properties = PropertiesUtil.getProperties(getApplicationContext());
         getRequiredNumberGroup();
 
         for(String requiredNumber : REQUIRED_NUMBER_GROUP){
@@ -88,22 +90,18 @@ public class MainActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public static MainActivity getINSTANCE(){
-        return INSTANCE;
-    }
-
     public void setListView(){
         lastQueryTime = new Date();
         Log.d(TAG, "run: Enter this task...");
         List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this,
                 REQUIRED_NUMBER_GROUP,
-                Integer.valueOf(properties.getProperty(PropertiesUtil.CALL_DURATION)));
+                APP_CONFIG.getCheckPeriod());
         if(callLogList.size() == 0 || !hasRequiredNumberGroup(callLogList)){
             TextView tvInfo = (TextView) findViewById(R.id.tv_info);
             tvInfo.setText("电话系统可能已暂停服务，请检查！");
             CallLogUtil.callPhone(MainActivity.this,
-                    properties.getProperty(PropertiesUtil.CALL_NUMBER),
-                    Integer.valueOf(properties.getProperty(PropertiesUtil.DEFAULT_SIM)));
+                    APP_CONFIG.getCallNumber(),
+                    APP_CONFIG.getDefaultSim());
         }
         SimpleAdapter adapter = new SimpleAdapter(this
                 , callLogList
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
         TextView tvQueryTime = (TextView) findViewById(R.id.tv_query);
         tvQueryTime.setText(DateUtil.format(lastQueryTime, DateUtil.DEFAULT_DATETIME_FORMAT));
         TextView tvNextQueryTime = (TextView) findViewById(R.id.tv_next_query);
-        tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(lastQueryTime,(Integer.valueOf(properties.getProperty(PropertiesUtil.RUN_DURATION))) / (60 * 1000)),
+        tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(lastQueryTime,(int)APP_CONFIG.getRunDuration() / (60 * 1000)),
                 DateUtil.DEFAULT_DATETIME_FORMAT));
     }
 
@@ -224,7 +222,7 @@ public class MainActivity extends AppCompatActivity {
         for(Map.Entry<String, Integer> entry : numberMissCountMap.entrySet()){
             String number = entry.getKey();
             Integer numberCount = entry.getValue();
-            if(numberCount >= Integer.valueOf(properties.getProperty(PropertiesUtil.NUMBER_MISS_THRESHOLD))){
+            if(numberCount >= Integer.valueOf(APP_CONFIG.getNumberMissThreshold())){
                 numberMissCount2 ++;
                 // Reset the missing times.
                 numberMissCountMap.put(number, 0);
@@ -236,7 +234,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void getRequiredNumberGroup(){
-        String numberGroupStr = MainActivity.this.properties.getProperty(PropertiesUtil.REQUIRED_NUMBER_GROUP);
+        String numberGroupStr = APP_CONFIG.getRequiredNumberGroup();
         String[] split = numberGroupStr.split(",");
         for(String str : split)
             REQUIRED_NUMBER_GROUP.add(str);

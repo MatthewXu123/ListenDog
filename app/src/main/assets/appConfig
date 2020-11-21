@@ -4,6 +4,6 @@ required_number_group=051266628226,051266628227
 
 #other
 default_sim=0
-call_duration=15
+check_period=15
 number_miss_threshold=2
 run_duration=3600000
