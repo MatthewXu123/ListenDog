@@ -90,7 +90,8 @@ public class CallLogUtil {
      * @return
      */
     private static boolean isCallDateQualified(Date callLogDate, int callDuration){
-        Date lastHourTime = DateUtil.getLastHourTime(-1);
+        //Date lastHourTime = DateUtil.getLastHourTime(-1);
+        Date lastHourTime = DateUtil.getLastHourTime(0);
         return callLogDate.after(DateUtil.addMinutes(lastHourTime, -1 * callDuration)) && callLogDate.before(DateUtil.addMinutes(lastHourTime, callDuration));
     }
 

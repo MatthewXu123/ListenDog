@@ -62,6 +62,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         checkPermission();
         INSTANCE = this;
+        PropertiesUtil.initAppConfig();
         getRequiredNumberGroup();
 
         for(String requiredNumber : REQUIRED_NUMBER_GROUP){

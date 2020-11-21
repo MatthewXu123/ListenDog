@@ -14,6 +14,6 @@ public class App extends Application {
         super.onCreate();
         Log.d(TAG, "onCreate: App");
         // Initialize the app configuration.
-        PropertiesUtil.initAppConfig();
+        //PropertiesUtil.initAppConfig();
     }
 }

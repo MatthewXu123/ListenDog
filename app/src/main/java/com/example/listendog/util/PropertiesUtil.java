@@ -20,7 +20,7 @@ public class PropertiesUtil {
             //InputStream in = c.getAssets().open("appConfig.properties");
             //InputStream in = c.getAssets().open("appConfig");
             //方法二：通过class获取setting.properties的FileInputStream
-            InputStream in = PropertiesUtil.class.getResourceAsStream("/assets/appConfig.properties");
+            InputStream in = PropertiesUtil.class.getResourceAsStream("/assets/appConfig");
             props.load(in);
         } catch (Exception e1) {
             Log.e(TAG, e1.getMessage() );

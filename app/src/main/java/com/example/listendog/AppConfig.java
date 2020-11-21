@@ -67,4 +67,16 @@ public class AppConfig {
     public void setRunDuration(long runDuration) {
         this.runDuration = runDuration;
     }
+
+    @Override
+    public String toString() {
+        return "AppConfig{" +
+                "callNumber='" + callNumber + '\'' +
+                ", requiredNumberGroup='" + requiredNumberGroup + '\'' +
+                ", defaultSim=" + defaultSim +
+                ", checkPeriod=" + checkPeriod +
+                ", numberMissThreshold=" + numberMissThreshold +
+                ", runDuration=" + runDuration +
+                '}';
+    }
 }
