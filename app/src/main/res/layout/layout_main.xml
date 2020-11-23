@@ -11,18 +11,20 @@
         android:id="@+id/tv_info"
         android:textSize="20sp"
         android:layout_marginTop="10dp"
-        android:text="监测中。。。目前情况正常"
+        android:text="@string/tv_main_info_tostart"
     />
    <LinearLayout
+       android:id="@+id/llo_main_last_query"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="horizontal"
-       android:layout_marginTop="40dp">
+       android:layout_marginTop="40dp"
+       android:visibility="invisible">
        <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
            android:textSize="20sp"
-           android:text="上次查询时间:"
+           android:text="@string/tv_main_last_querytime"
            />
        <TextView
            android:layout_width="wrap_content"
@@ -32,15 +34,17 @@
            />
    </LinearLayout>
     <LinearLayout
+        android:id="@+id/llo_main_next_query"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="70dp">
+        android:layout_marginTop="70dp"
+        android:visibility="invisible">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
-            android:text="下次查询时间:"
+            android:text="@string/tv_main_next_querytime"
             />
         <TextView
             android:layout_width="wrap_content"

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
@@ -12,6 +13,8 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -24,6 +27,7 @@ import com.example.listendog.service.AlarmService;
 import com.example.listendog.util.CallLogUtil;
 import com.example.listendog.util.DateUtil;
 import com.example.listendog.util.PropertiesUtil;
+import com.example.listendog.util.SharedPreferencesUtil;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -59,7 +63,7 @@ public class MainActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         checkPermission();
         INSTANCE = this;
-        PropertiesUtil.initAppConfig();
+        //PropertiesUtil.initAppConfig(MainActivity.this);
         getRequiredNumberGroup();
 
         for(String requiredNumber : REQUIRED_NUMBER_GROUP){
@@ -67,8 +71,6 @@ public class MainActivity extends BaseActivity {
         }
         setContentView(R.layout.layout_main);
         mLVShow = (ListView) findViewById(R.id.lv_show);
-        Intent intent=new Intent(this, AlarmService.class);
-        startService(intent);
     }
 
     @Override
@@ -78,12 +80,53 @@ public class MainActivity extends BaseActivity {
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem item = menu.getItem(0);
+        if(item.getTitle().equals("start")){
+            item.setIcon(R.drawable.icon_stop);
+            item.setTitle("stop");
+        }
+        if(item.getTitle().equals("stop")){
+            item.setIcon(R.drawable.icon_start);
+            item.setTitle("start");
+        }
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        LinearLayout lastQueryLayout = (LinearLayout)findViewById(R.id.llo_main_last_query);
+        LinearLayout nextQueryLayout = (LinearLayout)findViewById(R.id.llo_main_next_query);
+        ListView lv = (ListView)findViewById(R.id.lv_show);
         switch (item.getItemId()){
             case R.id.item_setting:{
                 Intent intent = new Intent(MainActivity.this, SettingsActivity.class);
                 startActivity(intent);
+                break;
             }
+            case R.id.item_start:{
+                if(item.getTitle().equals(MainActivity.this.getResources().getText(R.string.item_title_start))){
+                    item.setIcon(R.drawable.icon_stop);
+                    item.setTitle(R.string.item_title_stop);
+                    Intent intent=new Intent(MainActivity.this, AlarmService.class);
+                    startService(intent);
+                    lastQueryLayout.setVisibility(View.VISIBLE);
+                    nextQueryLayout.setVisibility(View.VISIBLE);
+                    lv.setVisibility(View.VISIBLE);
+                }else if(item.getTitle().equals(MainActivity.this.getResources().getText(R.string.item_title_stop))){
+                    item.setIcon(R.drawable.icon_start);
+                    item.setTitle(R.string.item_title_start);
+                    lastQueryLayout.setVisibility(View.INVISIBLE);
+                    nextQueryLayout.setVisibility(View.INVISIBLE);
+                    lv.setVisibility(View.INVISIBLE);
+                    TextView tvMainInfo = (TextView)findViewById(R.id.tv_info);
+                    tvMainInfo.setText(R.string.tv_main_info_tostart);
+                    Intent intent=new Intent(MainActivity.this, AlarmService.class);
+                    stopService(intent);
+                }
+                break;
+            }
+            default:
         }
         return super.onOptionsItemSelected(item);
     }
@@ -93,14 +136,17 @@ public class MainActivity extends BaseActivity {
         Log.d(TAG, "run: Enter this task...");
         List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this,
                 REQUIRED_NUMBER_GROUP,
-                APP_CONFIG.getCheckPeriod());
+                SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.CHECK_PERIOD));
+        TextView tvInfo = (TextView) findViewById(R.id.tv_info);
         if(callLogList.size() == 0 || !hasRequiredNumberGroup(callLogList)){
-            TextView tvInfo = (TextView) findViewById(R.id.tv_info);
-            tvInfo.setText("电话系统可能已暂停服务，请检查！");
+            tvInfo.setText(R.string.tv_main_info_abnormal);
             CallLogUtil.callPhone(MainActivity.this,
-                    APP_CONFIG.getCallNumber(),
-                    APP_CONFIG.getDefaultSim());
+                    SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.CALL_NUMBER),
+                    SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.DEFAULT_SIM));
+        }else{
+            tvInfo.setText(R.string.tv_main_info_normal);
         }
+
         SimpleAdapter adapter = new SimpleAdapter(this
                 , callLogList
                 , R.layout.item_call_log
@@ -111,7 +157,7 @@ public class MainActivity extends BaseActivity {
         TextView tvQueryTime = (TextView) findViewById(R.id.tv_query);
         tvQueryTime.setText(DateUtil.format(lastQueryTime, DateUtil.DEFAULT_DATETIME_FORMAT));
         TextView tvNextQueryTime = (TextView) findViewById(R.id.tv_next_query);
-        tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(lastQueryTime,(int)APP_CONFIG.getRunDuration() / (60 * 1000)),
+        tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(lastQueryTime,SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.RUN_DURATION)),
                 DateUtil.DEFAULT_DATETIME_FORMAT));
     }
 
@@ -220,7 +266,7 @@ public class MainActivity extends BaseActivity {
         for(Map.Entry<String, Integer> entry : numberMissCountMap.entrySet()){
             String number = entry.getKey();
             Integer numberCount = entry.getValue();
-            if(numberCount >= Integer.valueOf(APP_CONFIG.getNumberMissThreshold())){
+            if(numberCount >= Integer.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.NUMBER_MISS_THRESHOLD))){
                 numberMissCount2 ++;
                 // Reset the missing times.
                 numberMissCountMap.put(number, 0);
@@ -232,7 +278,7 @@ public class MainActivity extends BaseActivity {
     }
 
     public void getRequiredNumberGroup(){
-        String numberGroupStr = APP_CONFIG.getRequiredNumberGroup();
+        String numberGroupStr = SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.REQUIRED_NUMBER_GROUP);
         String[] split = numberGroupStr.split(",");
         for(String str : split)
             REQUIRED_NUMBER_GROUP.add(str);

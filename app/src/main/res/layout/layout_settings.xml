@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -10,109 +9,114 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="联系人电话"
-        android:textSize="20sp"
-        />
+        android:text="@string/tv_setting_call_number"
+        android:textSize="20sp"/>
         <EditText
             android:id="@+id/et_call_number"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="请输入11位号码"/>
+            android:layout_weight="1"
+            android:hint="@string/ethint_setting_call_number"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginTop="130dp">
+        android:layout_marginTop="5dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="服务器电话"
+            android:text="@string/tv_setting_required_number_group"
             android:textSize="20sp"
             />
         <EditText
-            android:id="@+id/required_number_group"
-            android:layout_width="wrap_content"
+            android:id="@+id/et_required_number_group"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="请输入完整号码，以英文逗号隔开"/>
+            android:hint="@string/ethint_setting_required_number_group"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="200dp">
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="默认拨打卡号"
+            android:text="@string/tv_setting_default_sim"
             android:textSize="20sp"
             />
         <EditText
-            android:id="@+id/default_sim"
-            android:layout_width="wrap_content"
+            android:id="@+id/et_default_sim"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint="卡1输入0，卡2输入1"/>
+            android:layout_weight="1"
+            android:hint="@string/ethint_setting_default_sim"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="270dp">
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="检查通话记录前后间隔"
+            android:text="@string/tv_number_miss_threshold"
             android:textSize="20sp"
             />
         <EditText
-            android:id="@+id/call_duration"
-            android:layout_width="wrap_content"
+            android:id="@+id/et_number_miss_threshold"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint=""/>
+            android:layout_weight="1"
+            android:hint="@string/ethint_number_miss_threshold"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="340dp">
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="单个号码不拨打次数阈值"
+            android:text="@string/tv_check_period"
             android:textSize="20sp"
             />
         <EditText
-            android:id="@+id/number_miss_threshold"
-            android:layout_width="wrap_content"
+            android:id="@+id/et_check_period"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint=""/>
+            android:layout_weight="1"
+            android:hint="@string/ethint_check_period"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_marginTop="410dp">
+        android:orientation="horizontal"
+        android:layout_marginTop="5dp">
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="app检查间隔"
+            android:text="@string/tv_run_duration"
             android:textSize="20sp"
             />
         <EditText
-            android:id="@+id/run_duration"
-            android:layout_width="wrap_content"
+            android:id="@+id/et_run_duration"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:hint=""/>
+            android:layout_weight="1"
+            android:hint="@string/ethint_run_duration"/>
     </LinearLayout>
     <Button
         android:id="@+id/btn_settings_submit"
-        android:gravity="center"
+        android:layout_gravity="center"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="提交"
-        android:layout_marginTop="440dp"/>
-</RelativeLayout>
+        android:layout_marginTop="10dp"/>
+</LinearLayout>

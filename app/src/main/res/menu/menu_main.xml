@@ -7,11 +7,12 @@
     <item
         android:id="@+id/item_start"
         android:icon="@drawable/icon_start"
-        android:title="运行"
+        android:title="@string/item_title_start"
         app:showAsAction="always" />
-
     <item
         android:id="@+id/item_setting"
-        android:title="设置"/>
+        app:showAsAction="always"
+        android:icon="@drawable/icon_setting"
+        android:title="@string/item_title_setting"/>
 </menu>
 

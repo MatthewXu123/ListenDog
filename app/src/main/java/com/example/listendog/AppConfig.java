@@ -14,7 +14,7 @@ public class AppConfig {
 
     private int numberMissThreshold;
 
-    private long runDuration;
+    private int runDuration;
 
     private AppConfig(){
 
@@ -60,11 +60,11 @@ public class AppConfig {
         this.numberMissThreshold = numberMissThreshold;
     }
 
-    public long getRunDuration() {
+    public int getRunDuration() {
         return runDuration;
     }
 
-    public void setRunDuration(long runDuration) {
+    public void setRunDuration(int runDuration) {
         this.runDuration = runDuration;
     }
 

@@ -24,4 +24,27 @@
 
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+
+    <!-- 自定义 -->
+    <string name="tv_main_info_tostart">点击开始</string>
+    <string name="tv_main_info_normal">监测中，目前情况正常。</string>
+    <string name="tv_main_info_abnormal">服务器出现问题</string>
+    <string name="tv_main_last_querytime">上次查询时间:</string>
+    <string name="tv_main_next_querytime">下次查询时间:</string>
+    <string name="item_title_start">start</string>
+    <string name="item_title_stop">stop</string>
+    <string name="item_title_setting">setting</string>
+    <string name="tv_setting_call_number">呼叫电话</string>
+    <string name="ethint_setting_call_number">请输入11位手机号</string>
+    <string name="tv_setting_required_number_group">受监控的电话号码</string>
+    <string name="ethint_setting_required_number_group">请输入电话，以英文逗号分开。</string>
+    <string name="tv_setting_default_sim">双卡默认呼出电话设置</string>
+    <string name="ethint_setting_default_sim">卡1填0，卡2填1</string>
+    <string name="tv_number_miss_threshold">单个受监控电话不拨打阈值</string>
+    <string name="ethint_number_miss_threshold">请输入数字</string>
+    <string name="tv_check_period">检查间隔（分钟）</string>
+    <string name="ethint_check_period">请输入数字</string>
+    <string name="tv_run_duration">app运行间隔（分钟）</string>
+    <string name="ethint_run_duration">请输入数字</string>
+    <string name="toast_submit">已提交</string>
 </resources>
