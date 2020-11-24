@@ -1,12 +1,15 @@
 package com.example.listendog;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.AlertDialog;
+import android.app.PendingIntent;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.provider.CallLog;
 import android.provider.Settings;
 import android.util.Log;
@@ -22,7 +25,9 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.listendog.service.AlarmReceive;
 import com.example.listendog.service.AlarmService;
+import com.example.listendog.service.CallLogCheckSerivce;
 import com.example.listendog.util.CallLogUtil;
 import com.example.listendog.util.DateUtil;
 
@@ -106,7 +111,8 @@ public class MainActivity extends BaseActivity {
                     item.setIcon(R.drawable.icon_stop);
                     item.setTitle(R.string.item_title_stop);
                     Intent intent=new Intent(MainActivity.this, AlarmService.class);
-                    startService(intent);
+                    //startService(intent);
+                    startCallLogAlarmManager();
                     lastQueryLayout.setVisibility(View.VISIBLE);
                     nextQueryLayout.setVisibility(View.VISIBLE);
                     lv.setVisibility(View.VISIBLE);
@@ -119,13 +125,30 @@ public class MainActivity extends BaseActivity {
                     TextView tvMainInfo = (TextView)findViewById(R.id.tv_info);
                     tvMainInfo.setText(R.string.tv_main_info_tostart);
                     Intent intent=new Intent(MainActivity.this, AlarmService.class);
-                    stopService(intent);
+                    //stopService(intent);
+                    cancelCallLogAlarmManager();
                 }
                 break;
             }
             default:
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void startCallLogAlarmManager(){
+        AlarmManager callLogAlarmManger= (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent i=new Intent(this, CallLogCheckSerivce.class);
+        PendingIntent pIntent=PendingIntent.getBroadcast(this,0,i,0);
+        callLogAlarmManger.setRepeating(AlarmManager.RTC_WAKEUP,
+                System.currentTimeMillis(),(long)(1 * (60 * 1000)),
+                pIntent );
+    }
+
+    private void cancelCallLogAlarmManager(){
+        AlarmManager callLogAlarmManger= (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent i=new Intent(this, CallLogCheckSerivce.class);
+        PendingIntent pIntent=PendingIntent.getBroadcast(this,0,i,0);
+        callLogAlarmManger.cancel(pIntent);
     }
 
     public void setListView(){
