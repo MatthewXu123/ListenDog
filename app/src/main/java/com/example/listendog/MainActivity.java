@@ -172,12 +172,6 @@ public class MainActivity extends BaseActivity {
                         , new int[] { R.id.tv_name, R.id.tv_number, R.id.tv_date});
                 mLVShow.setAdapter(adapter);
             }
-            // Set the value of query time.
-            TextView tvQueryTime = (TextView) findViewById(R.id.tv_query);
-            tvQueryTime.setText(DateUtil.format(lastQueryTime, DateUtil.DEFAULT_DATETIME_FORMAT));
-            TextView tvNextQueryTime = (TextView) findViewById(R.id.tv_next_query);
-            tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(lastQueryTime,SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.RUN_DURATION)),
-                    DateUtil.DEFAULT_DATETIME_FORMAT));
         }catch (Exception e){
             Log.e(TAG, "setListView: " + e.getMessage() );
         }
@@ -306,5 +300,12 @@ public class MainActivity extends BaseActivity {
             REQUIRED_NUMBER_GROUP.add(str);
     }
 
+    public Date getLastQueryTime() {
+        return lastQueryTime;
+    }
+
+    public void setLastQueryTime(Date lastQueryTime) {
+        this.lastQueryTime = lastQueryTime;
+    }
 }
 
