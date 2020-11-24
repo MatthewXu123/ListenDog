@@ -108,7 +108,8 @@ public class MainActivity extends BaseActivity {
                 if(item.getTitle().equals(MainActivity.this.getResources().getText(R.string.item_title_start))){
                     item.setIcon(R.drawable.icon_stop);
                     item.setTitle(R.string.item_title_stop);
-                    startCallLogAlarmManager();
+                    Intent intent=new Intent(MainActivity.this, CallLogCheckSerivce.class);
+                    startService(intent);
                     lastQueryLayout.setVisibility(View.VISIBLE);
                     nextQueryLayout.setVisibility(View.VISIBLE);
                     lv.setVisibility(View.VISIBLE);
@@ -120,7 +121,8 @@ public class MainActivity extends BaseActivity {
                     lv.setVisibility(View.INVISIBLE);
                     TextView tvMainInfo = (TextView)findViewById(R.id.tv_info);
                     tvMainInfo.setText(R.string.tv_main_info_tostart);
-                    cancelCallLogAlarmManager();
+                    Intent intent=new Intent(MainActivity.this, CallLogCheckSerivce.class);
+                    stopService(intent);
                 }
                 break;
             }
