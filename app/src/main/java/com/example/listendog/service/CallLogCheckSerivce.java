@@ -18,12 +18,12 @@ public class CallLogCheckSerivce extends BaseService{
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: Enter the CallLogCheckSerivce...");
-        new Thread(new Runnable() {
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 MainActivity.getInstance().setListView();
             }
-        }).start();
+        });
         AlarmManager callLogAlarmManger= (AlarmManager) getSystemService(ALARM_SERVICE);
         Intent i = new Intent(this, CallLogCheckSerivce.class);
         PendingIntent pi = PendingIntent.getService(this,0, i ,0);
