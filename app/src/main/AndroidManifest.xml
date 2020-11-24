@@ -25,11 +25,6 @@
         </activity>
 
         <service
-            android:name=".service.AlarmService"
-            android:enabled="true"
-            android:exported="true" />
-        <receiver android:name=".service.AlarmReceive" />
-        <service
             android:name=".service.CallLogCheckSerivce"
             android:enabled="true"
             android:exported="true" />

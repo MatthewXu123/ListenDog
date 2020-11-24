@@ -25,8 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.listendog.service.AlarmReceive;
-import com.example.listendog.service.AlarmService;
 import com.example.listendog.service.CallLogCheckSerivce;
 import com.example.listendog.util.CallLogUtil;
 import com.example.listendog.util.DateUtil;
@@ -110,8 +108,6 @@ public class MainActivity extends BaseActivity {
                 if(item.getTitle().equals(MainActivity.this.getResources().getText(R.string.item_title_start))){
                     item.setIcon(R.drawable.icon_stop);
                     item.setTitle(R.string.item_title_stop);
-                    Intent intent=new Intent(MainActivity.this, AlarmService.class);
-                    //startService(intent);
                     startCallLogAlarmManager();
                     lastQueryLayout.setVisibility(View.VISIBLE);
                     nextQueryLayout.setVisibility(View.VISIBLE);
@@ -124,8 +120,6 @@ public class MainActivity extends BaseActivity {
                     lv.setVisibility(View.INVISIBLE);
                     TextView tvMainInfo = (TextView)findViewById(R.id.tv_info);
                     tvMainInfo.setText(R.string.tv_main_info_tostart);
-                    Intent intent=new Intent(MainActivity.this, AlarmService.class);
-                    //stopService(intent);
                     cancelCallLogAlarmManager();
                 }
                 break;
@@ -137,11 +131,14 @@ public class MainActivity extends BaseActivity {
 
     private void startCallLogAlarmManager(){
         AlarmManager callLogAlarmManger= (AlarmManager) getSystemService(ALARM_SERVICE);
-        Intent i=new Intent(this, CallLogCheckSerivce.class);
-        PendingIntent pIntent=PendingIntent.getBroadcast(this,0,i,0);
+        Intent i=new Intent(MainActivity.this, CallLogCheckSerivce.class);
+        PendingIntent pIntent=PendingIntent.getService(this,0,i,0);
+/*
         callLogAlarmManger.setRepeating(AlarmManager.RTC_WAKEUP,
                 System.currentTimeMillis(),(long)(1 * (60 * 1000)),
                 pIntent );
+*/
+        callLogAlarmManger.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 10 * 1000, pIntent);
     }
 
     private void cancelCallLogAlarmManager(){
