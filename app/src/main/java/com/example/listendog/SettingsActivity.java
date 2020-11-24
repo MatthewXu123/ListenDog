@@ -1,27 +1,17 @@
 package com.example.listendog;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.example.listendog.util.PropertiesUtil;
-
-import java.net.ConnectException;
-import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 public class SettingsActivity extends BaseActivity {
 
     private static final String TAG = "SettingsActivity";
-
-    private static final AppConfig APP_CONFIG = AppConfig.INSTANCE;
 
     private EditText etCallNumber;
     private EditText etRequiredNumberGroup;

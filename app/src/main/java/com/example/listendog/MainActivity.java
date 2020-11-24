@@ -5,7 +5,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.CallLog;
@@ -26,8 +25,6 @@ import androidx.core.content.ContextCompat;
 import com.example.listendog.service.AlarmService;
 import com.example.listendog.util.CallLogUtil;
 import com.example.listendog.util.DateUtil;
-import com.example.listendog.util.PropertiesUtil;
-import com.example.listendog.util.SharedPreferencesUtil;
 
 import java.util.ArrayList;
 import java.util.Date;

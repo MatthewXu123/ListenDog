@@ -2,15 +2,12 @@ package com.example.listendog.service;
 
 import android.app.AlarmManager;
 import android.app.PendingIntent;
-import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.util.Log;
 
 import com.example.listendog.MainActivity;
-import com.example.listendog.util.PropertiesUtil;
-import com.example.listendog.util.SharedPreferencesUtil;
 
 public class AlarmService extends BaseService {
     private static final String TAG = "AlarmService";

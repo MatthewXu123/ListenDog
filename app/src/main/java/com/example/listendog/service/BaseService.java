@@ -6,8 +6,6 @@ import android.os.IBinder;
 
 import androidx.annotation.Nullable;
 
-import com.example.listendog.AppConfig;
-import com.example.listendog.BaseActivity;
 import com.example.listendog.util.SharedPreferencesUtil;
 
 public class BaseService extends Service {
