@@ -16,10 +16,10 @@ public class AlarmService extends BaseService {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.d(TAG, "onStartCommand: Enter...");
-        MainActivity.getINSTANCE().runOnUiThread(new Runnable() {
+        MainActivity.getInstance().runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                MainActivity.getINSTANCE().setListView();
+                MainActivity.getInstance().setListView();
             }
         });
 

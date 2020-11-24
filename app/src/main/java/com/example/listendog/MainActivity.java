@@ -51,7 +51,7 @@ public class MainActivity extends BaseActivity {
     private Date lastQueryTime;
     public static final List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
 
-    public static MainActivity getINSTANCE(){
+    public static MainActivity getInstance(){
         return INSTANCE;
     }
 

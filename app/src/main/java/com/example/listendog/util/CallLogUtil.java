@@ -90,8 +90,8 @@ public class CallLogUtil {
      * @return
      */
     private static boolean isCallDateQualified(Date callLogDate, int callDuration){
-        Date lastHourTime = DateUtil.getLastHourTime(-1);
-        return callLogDate.after(DateUtil.addMinutes(lastHourTime, -1 * callDuration)) && callLogDate.before(DateUtil.addMinutes(lastHourTime, callDuration));
+        Date currHourTime = DateUtil.getCurrHourTime();
+        return callLogDate.after(currHourTime) && callLogDate.before(DateUtil.addMinutes(currHourTime, callDuration));
     }
 
     public static void callPhone(AppCompatActivity appCompatActivity, String number, int simId) {

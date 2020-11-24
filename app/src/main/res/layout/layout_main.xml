@@ -10,16 +10,17 @@
         android:layout_height="match_parent"
         android:id="@+id/tv_info"
         android:textSize="20sp"
-        android:layout_marginTop="10dp"
         android:text="@string/tv_main_info_tostart"
-    />
+        android:padding="10dp"
+        />
    <LinearLayout
        android:id="@+id/llo_main_last_query"
        android:layout_width="match_parent"
        android:layout_height="wrap_content"
        android:orientation="horizontal"
-       android:layout_marginTop="40dp"
-       android:visibility="invisible">
+       android:layout_marginTop="30dp"
+       android:visibility="invisible"
+       android:padding="10dp" >
        <TextView
            android:layout_width="wrap_content"
            android:layout_height="wrap_content"
@@ -38,8 +39,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="70dp"
-        android:visibility="invisible">
+        android:layout_marginTop="65dp"
+        android:visibility="invisible"
+        android:padding="10dp"
+        >
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
