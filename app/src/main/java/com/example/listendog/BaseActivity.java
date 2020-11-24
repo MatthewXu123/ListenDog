@@ -1,5 +1,6 @@
 package com.example.listendog;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -20,6 +21,7 @@ public class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         Log.d(TAG, getClass().getSimpleName());
         SHARED_PREFERENCES_UTIL = SharedPreferencesUtil.getInstance(BaseActivity.this);
     }

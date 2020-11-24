@@ -25,11 +25,11 @@
         </activity>
 
         <service
-            android:name=".service.AlarmService"
+            android:name=".service.CallLogCheckAlarmService"
             android:enabled="true"
             android:exported="true" />
 
-        <receiver android:name=".service.AlarmReceive" />
+        <receiver android:name=".service.CallLogCheckAlarmReceiver" />
     </application>
 
 </manifest>
