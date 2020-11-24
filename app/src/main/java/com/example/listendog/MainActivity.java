@@ -172,6 +172,11 @@ public class MainActivity extends BaseActivity {
                         , new int[] { R.id.tv_name, R.id.tv_number, R.id.tv_date});
                 mLVShow.setAdapter(adapter);
             }
+            TextView tvQueryTime = (TextView) MainActivity.getInstance().findViewById(R.id.tv_query);
+            tvQueryTime.setText(DateUtil.format(MainActivity.getInstance().getLastQueryTime(), DateUtil.DEFAULT_DATETIME_FORMAT));
+            TextView tvNextQueryTime = (TextView) MainActivity.getInstance().findViewById(R.id.tv_next_query);
+            tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(MainActivity.getInstance().getLastQueryTime(),SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.RUN_DURATION)),
+                    DateUtil.DEFAULT_DATETIME_FORMAT));
         }catch (Exception e){
             Log.e(TAG, "setListView: " + e.getMessage() );
         }

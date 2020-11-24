@@ -41,7 +41,7 @@ public class SharedPreferencesUtil {
         editor.putInt(DEFAULT_SIM, 0);
         editor.putInt(CHECK_PERIOD, 15);
         editor.putInt(NUMBER_MISS_THRESHOLD, 2);
-        editor.putInt(RUN_DURATION, 1);
+        editor.putInt(RUN_DURATION, 60);
         editor.apply();
     }
 
