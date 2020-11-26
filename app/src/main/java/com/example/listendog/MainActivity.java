@@ -51,7 +51,6 @@ public class MainActivity extends BaseActivity {
     // About the call logs
     private Map<String, Integer> numberMissCountMap = new HashMap<>();
     private ListView mLVShow;
-    private Date lastQueryTime;
     public static final List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
 
     public static MainActivity getInstance(){
@@ -150,33 +149,43 @@ public class MainActivity extends BaseActivity {
         callLogAlarmManger.cancel(pIntent);
     }
 
-    public void setListView(){
+    public void setListView(boolean isFirstRun, Date _nextQueryTime, Date lastQueryTime){
         try{
-            lastQueryTime = new Date();
-            Log.d(TAG, "run: Enter this task...");
-            List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this,
-                    REQUIRED_NUMBER_GROUP,
-                    SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.CHECK_PERIOD));
-            TextView tvInfo = (TextView) findViewById(R.id.tv_info);
-            if(callLogList.size() == 0 || !hasRequiredNumberGroup(callLogList)){
-                tvInfo.setText(R.string.tv_main_info_abnormal);
-            CallLogUtil.callPhone(MainActivity.this,
-                    SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.CALL_NUMBER),
-                    SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.DEFAULT_SIM));
+            Date nextQueryTime = null;
+            if(isFirstRun){
+                nextQueryTime = _nextQueryTime;
             }else{
-                tvInfo.setText(R.string.tv_main_info_normal);
-                SimpleAdapter adapter = new SimpleAdapter(this
-                        , callLogList
-                        , R.layout.item_call_log
-                        , CallLogUtil.COLUMNS
-                        , new int[] { R.id.tv_name, R.id.tv_number, R.id.tv_date});
-                mLVShow.setAdapter(adapter);
+                nextQueryTime = DateUtil.addMinutes(lastQueryTime, SHARED_PREFERENCES_UTIL.RUN_DURATION);
             }
             TextView tvQueryTime = (TextView) MainActivity.getInstance().findViewById(R.id.tv_query);
-            tvQueryTime.setText(DateUtil.format(MainActivity.getInstance().getLastQueryTime(), DateUtil.DEFAULT_DATETIME_FORMAT));
+            tvQueryTime.setText(isFirstRun ? "—— ——" : DateUtil.format(lastQueryTime, DateUtil.DEFAULT_DATETIME_FORMAT));
+
             TextView tvNextQueryTime = (TextView) MainActivity.getInstance().findViewById(R.id.tv_next_query);
-            tvNextQueryTime.setText(DateUtil.format(DateUtil.addMinutes(MainActivity.getInstance().getLastQueryTime(),SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.RUN_DURATION)),
+            tvNextQueryTime.setText(DateUtil.format(nextQueryTime,
                     DateUtil.DEFAULT_DATETIME_FORMAT));
+
+            TextView tvInfo = (TextView) findViewById(R.id.tv_info);
+            if(!isFirstRun){
+                List<Map<String, String>> callLogList = CallLogUtil.getSpecifiedCallLogList(MainActivity.this,
+                        REQUIRED_NUMBER_GROUP,
+                        SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.CHECK_PERIOD));
+                if(callLogList.size() == 0 || !hasRequiredNumberGroup(callLogList)){
+                    tvInfo.setText(R.string.tv_main_info_abnormal);
+                    CallLogUtil.callPhone(MainActivity.this,
+                            SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.CALL_NUMBER),
+                            SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.DEFAULT_SIM));
+                }else{
+                    tvInfo.setText(R.string.tv_main_info_normal);
+                    SimpleAdapter adapter = new SimpleAdapter(this
+                            , callLogList
+                            , R.layout.item_call_log
+                            , CallLogUtil.COLUMNS
+                            , new int[] { R.id.tv_name, R.id.tv_number, R.id.tv_date});
+                    mLVShow.setAdapter(adapter);
+                }
+            }else{
+                tvInfo.setText(R.string.tv_main_info_start);
+            }
         }catch (Exception e){
             Log.e(TAG, "setListView: " + e.getMessage() );
         }
@@ -305,12 +314,5 @@ public class MainActivity extends BaseActivity {
             REQUIRED_NUMBER_GROUP.add(str);
     }
 
-    public Date getLastQueryTime() {
-        return lastQueryTime;
-    }
-
-    public void setLastQueryTime(Date lastQueryTime) {
-        this.lastQueryTime = lastQueryTime;
-    }
 }
 

@@ -40,7 +40,7 @@ public class SettingsActivity extends BaseActivity {
                 intMap.put("default_sim", Integer.valueOf(etDefaultSim.getText().toString().trim()));
                 intMap.put("check_period", Integer.valueOf(etCheckPeriod.getText().toString().trim()));
                 intMap.put("number_miss_threshold", Integer.valueOf(etNumberMissThreshold.getText().toString().trim()));
-                intMap.put("run_duration", Integer.valueOf(etRunDuration.getText().toString().trim()));
+                //intMap.put("run_duration", Integer.valueOf(etRunDuration.getText().toString().trim()));
                 SHARED_PREFERENCES_UTIL.putStringMap(strMap);
                 SHARED_PREFERENCES_UTIL.putIntMap(intMap);
                 Toast.makeText(SettingsActivity.this, R.string.toast_submit, Toast.LENGTH_SHORT ).show();
@@ -54,14 +54,14 @@ public class SettingsActivity extends BaseActivity {
         etDefaultSim = (EditText)findViewById(R.id.et_default_sim);
         etCheckPeriod = (EditText)findViewById(R.id.et_check_period);
         etNumberMissThreshold = (EditText)findViewById(R.id.et_number_miss_threshold);
-        etRunDuration = (EditText)findViewById(R.id.et_run_duration);
+        //etRunDuration = (EditText)findViewById(R.id.et_run_duration);
 
         etCallNumber.setText(SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.CALL_NUMBER));
         etRequiredNumberGroup.setText(SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.REQUIRED_NUMBER_GROUP));
         etDefaultSim.setText(String.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.DEFAULT_SIM)));
         etCheckPeriod.setText(String.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.CHECK_PERIOD)));
         etNumberMissThreshold.setText(String.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.NUMBER_MISS_THRESHOLD)));
-        etRunDuration.setText(String.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.RUN_DURATION)));
+        //etRunDuration.setText(String.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.RUN_DURATION)));
     }
 
     @Override

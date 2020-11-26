@@ -27,6 +27,7 @@
 
     <!-- 自定义 -->
     <string name="tv_main_info_tostart">点击开始</string>
+    <string name="tv_main_info_start">即将开始监测</string>
     <string name="tv_main_info_normal">监测中，目前情况正常。</string>
     <string name="tv_main_info_abnormal">服务器出现问题</string>
     <string name="tv_main_last_querytime">上次查询时间:</string>
@@ -42,7 +43,7 @@
     <string name="ethint_setting_default_sim">卡1填0，卡2填1</string>
     <string name="tv_number_miss_threshold">单个受监控电话不拨打阈值</string>
     <string name="ethint_number_miss_threshold">请输入数字</string>
-    <string name="tv_check_period">检查间隔（分钟）</string>
+    <string name="tv_check_period">检查时间点（分钟）</string>
     <string name="ethint_check_period">请输入数字</string>
     <string name="tv_run_duration">app运行间隔（分钟）</string>
     <string name="ethint_run_duration">请输入数字</string>

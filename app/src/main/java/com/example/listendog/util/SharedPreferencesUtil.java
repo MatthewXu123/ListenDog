@@ -14,7 +14,8 @@ public class SharedPreferencesUtil {
     public static final String DEFAULT_SIM = "default_sim";
     public static final String CHECK_PERIOD = "check_period";
     public static final String NUMBER_MISS_THRESHOLD = "number_miss_threshold";
-    public static final String RUN_DURATION = "run_duration";
+    public static final int RUN_DURATION = 60;
+    //public static final String RUN_DURATION = "run_duration";
 
     private static SharedPreferences.Editor editor = null;
 
@@ -41,7 +42,7 @@ public class SharedPreferencesUtil {
         editor.putInt(DEFAULT_SIM, 0);
         editor.putInt(CHECK_PERIOD, 15);
         editor.putInt(NUMBER_MISS_THRESHOLD, 2);
-        editor.putInt(RUN_DURATION, 60);
+        //editor.putInt(RUN_DURATION, 60);
         editor.apply();
     }
 

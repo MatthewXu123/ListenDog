@@ -461,4 +461,14 @@ public class DateUtil {
         return ca.getTime();
     }
 
+    public static Date getNextQueryTime(int checkPeriod){
+        Calendar ca = Calendar.getInstance();
+        long currentTimeMillis = ca.getTimeInMillis();
+        int minute = ca.get(Calendar.MINUTE);
+        ca.set(Calendar.MINUTE, checkPeriod);
+        if(minute > checkPeriod)
+            ca.set(Calendar.HOUR_OF_DAY, ca.get(Calendar.HOUR_OF_DAY) + 1);
+        return ca.getTime();
+    }
+
 }
