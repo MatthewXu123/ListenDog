@@ -51,7 +51,7 @@ public class MainActivity extends BaseActivity {
     // About the call logs
     private Map<String, Integer> numberMissCountMap = new HashMap<>();
     private ListView mLVShow;
-    public static final List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
+    public static List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
 
     public static MainActivity getInstance(){
         return INSTANCE;
@@ -105,6 +105,9 @@ public class MainActivity extends BaseActivity {
             }
             case R.id.item_start:{
                 if(item.getTitle().equals(MainActivity.this.getResources().getText(R.string.item_title_start))){
+                    // To clear the map
+                    clearNumberMissCountMap();
+
                     item.setIcon(R.drawable.icon_stop);
                     item.setTitle(R.string.item_title_stop);
                     Intent intent=new Intent(MainActivity.this, CallLogCheckSerivce.class);
@@ -308,10 +311,18 @@ public class MainActivity extends BaseActivity {
     }
 
     public void getRequiredNumberGroup(){
+        REQUIRED_NUMBER_GROUP = new ArrayList<>();
         String numberGroupStr = SHARED_PREFERENCES_UTIL.getString(SHARED_PREFERENCES_UTIL.REQUIRED_NUMBER_GROUP);
         String[] split = numberGroupStr.split(",");
         for(String str : split)
             REQUIRED_NUMBER_GROUP.add(str);
+    }
+
+    private void clearNumberMissCountMap(){
+        for(Map.Entry<String, Integer> entry : numberMissCountMap.entrySet()){
+            String number = entry.getKey();
+            numberMissCountMap.put(number, 0);
+        }
     }
 
 }
