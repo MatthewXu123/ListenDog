@@ -49,7 +49,7 @@ public class MainActivity extends BaseActivity {
     };
 
     // About the call logs
-    private Map<String, Integer> numberMissCountMap = new HashMap<>();
+    private Map<String, List<Date>> numberMissCountMap = new HashMap<>();
     private ListView mLVShow;
     public static List<String> REQUIRED_NUMBER_GROUP = new ArrayList<>();
 
@@ -66,7 +66,7 @@ public class MainActivity extends BaseActivity {
         getRequiredNumberGroup();
 
         for(String requiredNumber : REQUIRED_NUMBER_GROUP){
-            numberMissCountMap.put(requiredNumber, 0);
+            numberMissCountMap.put(requiredNumber, new ArrayList<>());
         }
         setContentView(R.layout.layout_main);
         mLVShow = (ListView) findViewById(R.id.lv_show);
@@ -106,7 +106,7 @@ public class MainActivity extends BaseActivity {
             case R.id.item_start:{
                 if(item.getTitle().equals(MainActivity.this.getResources().getText(R.string.item_title_start))){
                     // To clear the map
-                    clearNumberMissCountMap();
+                    //clearNumberMissCountMap();
 
                     item.setIcon(R.drawable.icon_stop);
                     item.setTitle(R.string.item_title_stop);
@@ -291,18 +291,20 @@ public class MainActivity extends BaseActivity {
         }
         for(String requiredNumber : REQUIRED_NUMBER_GROUP){
             if(!numberList.contains(requiredNumber)){
-                numberMissCountMap.put(requiredNumber, numberMissCountMap.get(requiredNumber) + 1);
+                List<Date> missCount = numberMissCountMap.get(requiredNumber);
+                missCount.add(new Date());
+                numberMissCountMap.put(requiredNumber, missCount);
             }
         }
         // To count the numbers whose missing times are equal to or larger than the threshold.
         int numberMissCount2 = 0;
-        for(Map.Entry<String, Integer> entry : numberMissCountMap.entrySet()){
+        for(Map.Entry<String, List<Date>> entry : numberMissCountMap.entrySet()){
             String number = entry.getKey();
-            Integer numberCount = entry.getValue();
-            if(numberCount >= Integer.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.NUMBER_MISS_THRESHOLD))){
-                numberMissCount2 ++;
-                // Reset the missing times.
-                numberMissCountMap.put(number, 0);
+            List<Date> missCount = entry.getValue();
+            if(missCount.size() >= Integer.valueOf(SHARED_PREFERENCES_UTIL.getInt(SHARED_PREFERENCES_UTIL.NUMBER_MISS_THRESHOLD))){
+                numberMissCountMap.put(number, new ArrayList<>());
+                if(DateUtil.diffTime(missCount.get(1),missCount.get(0),DateUtil.CONSTANT_MINUTE) < 90)
+                    numberMissCount2 ++;
             }
         }
         if(numberMissCount2 > 0)
@@ -319,9 +321,9 @@ public class MainActivity extends BaseActivity {
     }
 
     private void clearNumberMissCountMap(){
-        for(Map.Entry<String, Integer> entry : numberMissCountMap.entrySet()){
+        for(Map.Entry<String, List<Date>> entry : numberMissCountMap.entrySet()){
             String number = entry.getKey();
-            numberMissCountMap.put(number, 0);
+            numberMissCountMap.put(number, new ArrayList<>());
         }
     }
 
